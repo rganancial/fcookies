@@ -1,38 +1,41 @@
-.App {
+html, body {
+  background: #e0e0e0;
+  color: #0b0b0b;
+}
+
+.fc-app {
+  padding: 20px;
+}
+
+.fortune {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 10px auto 5px;
+  width: 500px;
+  height: 100px;
+  background-color: white;
+  color: blue;
   text-align: center;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.fortune-top {
+  display: grid;
+  grid-template-columns: 10% 85% 5%;
+  grid-template-rows: 10px;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.fortune-body {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 43px auto;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.fortune-bottom {
+  display: grid;
+  grid-template-columns: 10% 90%;
+  grid-template-rows: 5px;
 }
-
-.App-link {
-  color: #61dafb;
+.fortune-top > .box:first-child,
+.fortune-bottom>.box:first-child {
+  background-color: blue;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.fortune-top>.box:last-child {
+  background-color: blue;
 }
