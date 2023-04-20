@@ -1,13 +1,16 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CssBaseline from "@mui/material/CssBaseline";
 import Home from "./pages/home";
 
 function App() {
     return (
         <Router>
-            <div className="fc-app">
+            <CssBaseline />
+            <div className="fc-app container">
                 <header className="fc-app-header">
-                    <p>Home of the future fCookies project revival site!</p>
+                    <h1 id="logo">fCookies</h1>
+                    <span className="fc-tagline">Bet you can't read just one!!</span>
                 </header>
                 <main>
                     <Routes>
