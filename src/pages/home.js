@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, doc } from "firebase/firestore";
+import {
+    collection,
+    collectionGroup,
+    getDocs,
+    getDoc,
+    doc,
+    where,
+    query,
+    getCountFromServer,
+    onSnapshot
+} from "firebase/firestore";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,10 +24,16 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [numbers, setNumbers] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(
+        "x5lqNi6x70igG4WewJM6"
+    );
+    const [selectedSlug, setSelectedSlug] = useState("");
+    const [fortune, setFortune] = useState({});
 
     const handleCategoryChange = (event) => {
-        setSelectedCategory(event.target.value);
+        const id = event.target.value;
+        setSelectedCategory(id);
     };
 
     const handleCookieOpen = (event) => {
@@ -41,8 +57,33 @@ const Home = () => {
             result.push(rand);
         }
 
-        return result;
+        setNumbers(result);
     };
+
+    const getFortune = async () => {
+        const collectionRef = collection(
+            db,
+            "categories",
+            selectedCategory,
+            "fortunes"
+        );
+
+        onSnapshot(collectionRef, (querySnapshot) => {
+            const random = Math.floor(Math.random() * querySnapshot.size);
+            const fortune = querySnapshot.docs[random].data();
+            setFortune(fortune);
+        });
+    };
+
+    useEffect(() => {
+        if (categories.length && selectedCategory) {
+            setSelectedSlug(
+                categories.filter((c) => c.id === selectedCategory)[0].slug
+            );
+        } else {
+            setSelectedSlug("");
+        }
+    }, [categories, selectedCategory]);
 
     useEffect(() => {
         let fcookie = document.querySelector("#fc-cookie").classList,
@@ -54,6 +95,8 @@ const Home = () => {
         if (isOpen) {
             fcookie.remove(spawned);
             fcookie.add(opened);
+            generateLuckyNumbers();
+            getFortune();
             setTimeout(() => {
                 fcookie.add(hide);
             }, 500);
@@ -62,7 +105,7 @@ const Home = () => {
                 fcookie.remove(opened);
                 fcookie.add(spawned);
                 fcookie.remove(hide);
-            fortune.add(hide);
+                fortune.add(hide);
             }, 200);
         }
     }, [isOpen]);
@@ -101,11 +144,24 @@ const Home = () => {
                         onChange={handleCategoryChange}
                     >
                         {categories.length ? (
-                            categories.map((category) => (
-                                <MenuItem key={category.id} value={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))
+                            categories
+                                .sort((a, b) => {
+                                    if (a === "" || a === null) return -1;
+                                    if (b === "" || b === null) return 1;
+                                    if (a === b) return 0;
+                                    return a.displayOrderOverride <
+                                        b.displayOrderOverride
+                                        ? -1
+                                        : 1;
+                                })
+                                .map((category) => (
+                                    <MenuItem
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </MenuItem>
+                                ))
                         ) : loading ? (
                             <MenuItem value="">Loading...</MenuItem>
                         ) : (
@@ -153,13 +209,13 @@ const Home = () => {
                         <div className="box"></div>
                     </div>
                     <div className="fortune-body">
-                        <div className="fortune-text box">
-                            Fortune text will be here...
+                        <div className="fc-fortune-text box">
+                            {fortune.fortuneText}
                         </div>
-                        <div className="fortune-lucky-numbers box">
+                        <div className="fc-lucky-numbers box">
                             <strong>Lucky Numbers: </strong>
                             <span className="fortune-lucky-numbers-text">
-                                {generateLuckyNumbers().join("-")}
+                                {numbers.join("-")}
                             </span>
                         </div>
                     </div>
